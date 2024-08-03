@@ -4,6 +4,7 @@ from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 
 from metabci.brainda.algorithms.deep_learning import ConvCA, EEGNet
+from metabci.brainda.algorithms.deep_learning.fbcnet import FBCNet
 from metabci.brainda.algorithms.deep_learning.guney_net import GuneyNet
 from metabci.brainda.algorithms.utils.model_selection import (
     set_random_seeds,
@@ -11,21 +12,38 @@ from metabci.brainda.algorithms.utils.model_selection import (
 from metabci.brainda.algorithms.decomposition import CSP
 from metabci.brainda.algorithms.deep_learning.shallownet import ShallowNet
 from metabci.brainda.algorithms.deep_learning.deepnet import Deep4Net
-from metabci.brainda.datasets import AlexMI
+from metabci.brainda.datasets import AlexMI, BNCI2014001
 from metabci.brainda.paradigms import MotorImagery
+from metabci.brainda.paradigms import SSVEP
+from metabci.brainda.datasets import Wang2016
 
-dataset = AlexMI()  # declare the dataset
+# dataset = AlexMI()  # declare the dataset
+# paradigm = MotorImagery(
+#     channels=None,
+#     events=['right_hand', 'feet'],
+#     intervals=[(0, 3)],
+#     srate=128
+# )  # declare the paradigm, use recommended Options
+
+# dataset = Wang2016()
+dataset = BNCI2014001()
 paradigm = MotorImagery(
     channels=None,
     events=['right_hand', 'feet'],
-    intervals=None,
-    srate=None
+    intervals=[(0, 3)],
+    srate=128
 )  # declare the paradigm, use recommended Options
+
+# paradigm = SSVEP(
+#     channels=['POZ', 'PZ', 'PO3', 'PO5', 'PO4', 'PO6', 'O1', 'OZ', 'O2'],
+#     intervals=[(0.14, 0.64)],
+#     srate=250
+# )
 
 # X,y are numpy array and meta is pandas dataFrame
 X, y, meta = paradigm.get_data(
     dataset,
-    subjects=[8],
+    subjects=[3],
     return_concat=True,
     n_jobs=None,
     verbose=False)
@@ -55,7 +73,11 @@ indices = generate_kfold_indices(meta, kfold=kfold)
 # T: [batch size, number of channels, number of classes, number of sample points]
 
 
+
+
 estimator = ShallowNet(X.shape[1], X.shape[2], 2)
+# estimator = FBCNet(X.shape[1], X.shape[2], 2)
+
 
 accs = []
 for k in range(kfold):

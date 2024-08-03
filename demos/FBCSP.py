@@ -3,7 +3,9 @@ import numpy as np
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 from metabci.brainda.datasets import AlexMI
+from metabci.brainda.datasets import Wang2016
 from metabci.brainda.paradigms import MotorImagery
+from metabci.brainda.paradigms import SSVEP
 from metabci.brainda.algorithms.utils.model_selection import (
     set_random_seeds,
     generate_kfold_indices, match_kfold_indices)
@@ -14,13 +16,20 @@ wp=[(4,8),(8,12),(12,30)]
 ws=[(2,10),(6,14),(10,32)]
 filterbank = generate_filterbank(wp,ws,srate=128,order=4,rp=0.5)
 
-dataset = AlexMI()
-paradigm = MotorImagery(
-    channels=None,
-    events=['right_hand', 'feet'],
-    intervals=[(0, 3)], # 3 seconds
-    srate=128
+# dataset = AlexMI()
+dataset = Wang2016()
+# paradigm = MotorImagery(
+#     channels=None,
+#     events=['right_hand', 'feet'],
+#     intervals=[(0, 3)], # 3 seconds
+#     srate=128
+# )
+paradigm = SSVEP(
+    channels=['POZ', 'PZ', 'PO3', 'PO5', 'PO4', 'PO6', 'O1', 'OZ', 'O2'],
+    intervals=[(0.14, 0.64)],
+    srate=250
 )
+
 
 # add 6-30Hz bandpass filter in raw hook
 def raw_hook(raw, caches):
@@ -62,7 +71,7 @@ indices = generate_kfold_indices(meta, kfold=kfold)
 # FBCSP with SVC classifier
 estimator = make_pipeline(*[
     FBCSP(n_components=5,n_mutualinfo_components=4,filterbank=filterbank),
-    SVC()
+    # SVC()
 ])
 
 accs = []

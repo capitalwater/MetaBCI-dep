@@ -1118,6 +1118,7 @@ class MI(VisualStim):
 
         self.image_left_stimuli = visual.ElementArrayStim(
             self.win,
+            
             units="pix",
             elementTex=self.tex_left,
             elementMask=None,
@@ -1643,6 +1644,7 @@ class AVEP(VisualStim):
 
 
 # standard SSaVEP paradigm
+
 
 
 class SSAVEP(VisualStim):
@@ -3116,3 +3118,96 @@ def paradigm(
                     VSObject.text_response.draw()
                     iframe += 1
                     win.flip()
+
+class Oddball(VisualStim):
+    """
+    Create Oddball stimuli.
+
+    The subclass Oddball inherits from the parent class VisualStim, and duplicate properties are no longer listed.
+
+    Parameters
+    ----------
+        win:
+            The window object.
+        colorspace: str
+            The color space, default to rgb.
+        allowGUI: bool
+            Defaults to True, which allows frame-by-frame drawing and key-exit.
+    """
+
+
+    def __init__(self, win, colorSpace="rgb", allowGUI=True):
+        super().__init__(win=win, colorSpace=colorSpace, allowGUI=allowGUI)
+        self.win = win
+        self._exit = threading.Event()
+        # Removed tex_left and tex_right since images are not used anymore
+
+    def config_color(
+            self,
+            refresh_rate=60,
+            text_pos=(0.0, 0.0),
+            tex_color=(1, -1, -1),
+            symbol_height=100,
+            n_Elements=1,
+            stim_length=288,
+            stim_width=162,
+    ):
+        self.n_Elements = n_Elements
+        self.stim_length = stim_length
+        self.stim_width = stim_width
+        self.refresh_rate = refresh_rate
+        if refresh_rate == 0:
+            refresh_rate = np.floor(
+                self.win.getActualFrameRate(nIdentical=20, nWarmUpFrames=20)
+            )
+
+        if symbol_height == 0:
+            symbol_height = int(self.win.size[1] / 6)
+        self.text_stimulus = visual.TextStim(
+            self.win,
+            text="start",
+            font="Times New Roman",
+            pos=text_pos,
+            color=tex_color,
+            units="pix",
+            height=symbol_height,
+            bold=True,
+        )
+
+    def config_response(self, response_text="Response", response_color=[[-0.5, 0.9, 0.5]], text_pos=(0.0, 0.0),
+                        symbol_height=100):
+        # Configuring text response stimuli
+        self.response_text_stimulus = visual.TextStim(
+            self.win,
+            text=response_text,
+            font="Times New Roman",
+            pos=text_pos,
+            color=response_color,
+            units="pix",
+            height=symbol_height,
+            bold=True,
+        )
+
+    def config_index(self, index_height=0, units="pix"):
+        if index_height == 0:
+            index_height = int(self.stim_width / 3 * 2)
+        self.index_stimuli = visual.TextStim(
+            win=self.win,
+            text="\u2BC6",
+            font="Arial",
+            color=[1.0, -1.0, -1.0],
+            colorSpace="rgb",
+            units=units,
+            height=index_height,
+            bold=True,
+            autoLog=False,
+        )
+
+    def show_stimuli(self):
+        # Method to show stimuli on the window
+        self.text_stimulus.draw()
+        self.win.flip()
+        event.waitKeys()
+        self.response_text_stimulus.draw()
+        self.win.flip()
+        event.waitKeys()
