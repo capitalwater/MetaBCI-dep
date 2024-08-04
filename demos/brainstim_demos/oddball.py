@@ -6,7 +6,7 @@ def call_oddball_exe():
     # 获取当前脚本所在目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # 构建 odmball.exe 的路径
+    # 构建 oddball.exe 的路径
     oddball_exe_path = os.path.abspath(os.path.join(current_dir, '..', '..', 'oddball', 'oddball.exe'))
 
     # 检查文件是否存在

@@ -83,7 +83,7 @@ for train_index, test_index in kf.split(X):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(estimator.parameters(), lr=1e-5)
 
-    train_model(estimator, criterion, optimizer, train_loader, test_loader, num_epochs=25)
+    train_model(estimator, criterion, optimizer, train_loader, test_loader, num_epochs=10)
 
     accuracy = evaluate_model(estimator, test_loader)
     accs.append(accuracy)

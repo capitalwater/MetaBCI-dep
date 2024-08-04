@@ -11,9 +11,9 @@ def call_stroop_exe():
 
     # 检查文件是否存在
     if not os.path.isfile(stroop_exe_path):
-        raise FileNotFoundError(f"Could not find oddball.exe at {stroop_exe_path}")
+        raise FileNotFoundError(f"Could not find stroop.exe at {stroop_exe_path}")
 
-    # 调用 oddball.exe
+    # 调用 stroop.exe
     result = subprocess.run([stroop_exe_path], capture_output=True, text=True)
 
     # 输出结果

@@ -1,161 +1,133 @@
-# MetaBCI
+# 抑郁状态分析诊断系统
 
-## Welcome! 
-MetaBCI is an open-source platform for non-invasive brain computer interface. The project of MetaBCI is led by Prof. Minpeng Xu from Tianjin University, China. MetaBCI has 3 main parts:
-* brainda: for importing dataset, pre-processing EEG data and implementing EEG decoding algorithms.
-* brainflow: a high speed EEG online data processing framework.
-* brainstim: a simple and efficient BCI experiment paradigms design module. 
+本项目基于MetaBCI平台开发，主要新增了听觉oddball和情绪stroop两个刺激范式，以及增加了对FBCNet网络的适配。
 
-This is the first release of MetaBCI, our team will continue to maintain the repository. If you need the handbook of this repository, please contact us by sending email to TBC_TJU_2022@163.com with the following information:
-* Name of your teamleader
-* Name of your university(or organization)
+## 目录
 
-We will send you a copy of the handbook as soon as we receive your information.
+- [安装指南](#安装指南)
+- [使用方法](#使用方法)
+- [许可证](#许可证)
 
-- [MetaBCI](#metabci)
-  - [Welcome!](#welcome)
-  - [What are we doing?](#what-are-we-doing)
-    - [The problem](#the-problem)
-    - [The solution](#the-solution)
-  - [Features](#features)
-  - [Installation](#installation)
-  - [Who are we?](#who-are-we)
-  - [What do we need?](#what-do-we-need)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contact](#contact)
-  - [Acknowledgements](#acknowledgements)
+## 文件结构
+```
+MetaBCI
+    ├─.github
+    │  └─workflows
+    ├─.idea
+    │  └─inspectionProfiles
+    ├─demos
+    │  ├─brainflow_demos
+    │  │  └─__pycache__
+    │  ├─brainstim_demos
+    │  └─checkpoints
+    │      ├─1841207575504
+    │      ├─2291187830592
+    │      ├─2352513290304
+    │      ├─2395914360624
+    │      └─2673000058944
+    ├─docs
+    │  └─source
+    │      └─python_apis
+    ├─images
+    ├─metabci
+    │  ├─brainda
+    │  │  ├─algorithms
+    │  │  │  ├─decomposition
+    │  │  │  │  └─__pycache__
+    │  │  │  ├─deep_learning
+    │  │  │  │  └─__pycache__
+    │  │  │  ├─feature_analysis
+    │  │  │  │  └─__pycache__
+    │  │  │  ├─manifold
+    │  │  │  ├─transfer_learning
+    │  │  │  ├─utils
+    │  │  │  │  └─__pycache__
+    │  │  │  └─__pycache__
+    │  │  ├─datasets
+    │  │  │  └─__pycache__
+    │  │  ├─paradigms
+    │  │  │  └─__pycache__
+    │  │  ├─utils
+    │  │  │  └─__pycache__
+    │  │  └─__pycache__
+    │  ├─brainflow
+    │  ├─brainstim
+    │  │  ├─textures
+    │  │  └─__pycache__
+    │  └─__pycache__
+    ├─metabci.egg-info
+    ├─oddball
+    │  ├─MonoBleedingEdge
+    │  │  ├─EmbedRuntime
+    │  │  └─etc
+    │  │      └─mono
+    │  │          ├─2.0
+    │  │          │  └─Browsers
+    │  │          ├─4.0
+    │  │          │  └─Browsers
+    │  │          ├─4.5
+    │  │          │  └─Browsers
+    │  │          └─mconfig
+    │  └─oddball_Data
+    │      ├─Managed
+    │      └─Resources
+    ├─stroop
+    │  ├─MonoBleedingEdge
+    │  │  ├─EmbedRuntime
+    │  │  └─etc
+    │  │      └─mono
+    │  │          ├─2.0
+    │  │          │  └─Browsers
+    │  │          ├─4.0
+    │  │          │  └─Browsers
+    │  │          ├─4.5
+    │  │          │  └─Browsers
+    │  │          └─mconfig
+    │  └─stroop_Data
+    │      ├─Managed
+    │      └─Resources
+    │      ├─Managed
+    │      └─Resources
+    └─tests
+```
 
-## What are we doing?
+## 安装指南
 
-### The problem
+### 克隆仓库
 
-* BCI datasets come in different formats and standards
-* It's tedious to figure out the details of the data
-* Lack of python implementations of modern decoding algorithms
-* It's not an easy thing to perform BCI experiments especially for the online ones.
+```sh
+git clone https://github.com/capitalwater/MetaBCI-dep.git
+```
 
-If someone new to the BCI wants to do some interesting research, most of their time would be spent on preprocessing the data, reproducing the algorithm in the paper, and also find it difficult to bring the algorithms into BCI experiments.
+### 切换目录
+```sh
+cd your-repo
+```
+### 安装依赖
 
-### The solution
+```sh
+pip install -r requirements.txt 
+```
+### 安装项目
 
-The Meta-BCI will:
+```sh
+pip install -e .
+```
 
-* Allow users to load the data easily without knowing the details
-* Provide flexible hook functions to control the preprocessing flow
-* Provide the latest decoding algorithms
-* Provide the experiment UI for different paradigms (e.g. MI, P300 and SSVEP)
-* Provide the online data acquiring pipeline.
-* Allow users to bring their pre-trained models to the online decoding pipeline.
+## 使用方法
+### oddball实验范式
+打开demos/brainstim_demos/oddball.py，刺激程序开始运行，点击空格键，实验正式开始。  
 
-The goal of the Meta-BCI is to make researchers focus on improving their own BCI algorithms and performing their experiments without wasting too much time on preliminary preparations.
+实验前可打开串口调试助手,查看刺激范式发送的信息。任意时刻按下esc键退出。
 
-## Features
+![udp配置](udp配置.png)
+### stroop实验范式
+打开demos/brainstim_demosstroop.py，刺激程序开始运行，点击空格键，实验正式开始。  
+图片为开心时按键盘左键，图片为悲伤时按键盘左键。  
+实验前可打开串口调试助手,查看刺激范式发送的信息。任意时刻按下esc键退出。
+### FBCNet算法适配
+打开demos/FBCNet.py，程序开始运行，结束时输出准确率。
 
-* Improvements to MOABB APIs
-   - add hook functions to control the preprocessing flow more easily
-   - use joblib to accelerate the data loading
-   - add proxy options for network connection issues
-   - add more information in the meta of data
-   - other small changes
+## 许可证
 
-* Supported Datasets
-   - MI Datasets
-     - AlexMI
-     - BNCI2014001, BNCI2014004
-     - PhysionetMI, PhysionetME
-     - Cho2017
-     - MunichMI
-     - Schirrmeister2017
-     - Weibo2014
-     - Zhou2016
-   - SSVEP Datasets
-     - Nakanishi2015
-     - Wang2016
-     - BETA
-
-* Implemented BCI algorithms
-   - Decomposition Methods
-     - SPoC, CSP, MultiCSP and FBCSP
-     - CCA, itCCA, MsCCA, ExtendCCA, ttCCA, MsetCCA, MsetCCA-R, TRCA, TRCA-R, SSCOR and TDCA
-     - DSP
-   - Manifold Learning
-     - Basic Riemannian Geometry operations
-     - Alignment methods
-     - Riemann Procustes Analysis
-   - Deep Learning
-     - ShallowConvNet
-     - EEGNet
-     - ConvCA
-     - GuneyNet
-     - Cross dataset transfer learning based on pre-training
-   - Transfer Learning
-     - MEKT
-     - LST
-
-## Installation
-
-1. Clone the repo
-   ```sh
-   git clone https://github.com/TBC-TJU/MetaBCI.git
-   ```
-2. Change to the project directory
-   ```sh
-   cd MetaBCI
-   ```
-3. Install all requirements
-   ```sh
-   pip install -r requirements.txt 
-   ```
-4. Install brainda package with the editable mode
-   ```sh
-   pip install -e .
-   ```
-## Who are we?
-
-The MetaBCI project is carried out by researchers from 
-- Academy of Medical Engineering and Translational Medicine, Tianjin University, China
-- Tianjin Brain Center, China
-
-
-## What do we need?
-
-**You**! In whatever way you can help.
-
-We need expertise in programming, user experience, software sustainability, documentation and technical writing and project management.
-
-We'd love your feedback along the way.
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. **Any contributions you make are greatly appreciated**. Especially welcome to submit BCI algorithms.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-Distributed under the GNU General Public License v2.0 License. See `LICENSE` for more information.
-
-## Contact
-
-Email: TBC_TJU_2022@163.com
-
-## Paper
-
-If you applied MetaBCI in your research, please cite:
-Mei, J., Luo, R., Xu, L., Zhao, W., Wen, S., Wang, K., ... & Ming, D. (2023). MetaBCI: An open-source platform for brain-computer interfaces. Computers in Biology and Medicine, 107806.
-
-And this open access paper can be found here: [MetaBCI](https://www.sciencedirect.com/science/article/pii/S0010482523012714)
-
-## Acknowledgements
-- [MNE](https://github.com/mne-tools/mne-python)
-- [MOABB](https://github.com/NeuroTechX/moabb)
-- [pyRiemann](https://github.com/alexandrebarachant/pyRiemann)
-- [TRCA/eTRCA](https://github.com/mnakanishi/TRCA-SSVEP)
-- [EEGNet](https://github.com/vlawhern/arl-eegmodels)
-- [RPA](https://github.com/plcrodrigues/RPA)
-- [MEKT](https://github.com/chamwen/MEKT)
+该项目使用 [MIT 许可证](https://opensource.org/licenses/MIT) 进行授权。许可证的详细内容请参见 [LICENSE](LICENSE) 文件。
