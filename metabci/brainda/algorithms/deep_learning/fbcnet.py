@@ -9,6 +9,7 @@ import torch.nn as nn
 import sys
 import numpy as np
 import scipy.signal
+from .base import SkorchNet
 # from smt import SMT
 
 current_module = sys.modules[__name__]
@@ -275,7 +276,7 @@ def generate_filter_bands(data, fs, bands):
                 filtered_data[b, c, :, i] = bandpass_filter(data[b, c, :], low, high, fs)
     return filtered_data
 
-
+@SkorchNet
 class FBCNet(nn.Module):
     # just a FBCSP like structure : chan conv and then variance along the time axis
     '''
@@ -303,8 +304,7 @@ class FBCNet(nn.Module):
 
     def __init__(self, nChan, nTime, nClass=2, nBands=9, m=32,
                  temporalLayer='LogVarLayer', strideFactor=4, doWeightNorm=True, *args, **kwargs):
-        super(FBCNet,
-              self).__init__()  ######################################################################################################################7.26
+        super().__init__()  ###############7.26
 
         self.nBands = nBands
         self.m = m
@@ -322,7 +322,7 @@ class FBCNet(nn.Module):
     def forward(self, x):
         # 调整输入的维度 [batch, channels, time] -> [batch, channels, time, filterBands]
         x_filtered = generate_filter_bands(x.numpy(), fs=250, bands = [(0.5, 4), (4, 8), (8, 13), (13, 20), (20, 30), (30, 40), (40, 50), (50, 60), (60, 70)])
-        x_filtered = torch.tensor(x_filtered, dtype=torch.float32).unsqueeze(1)
+        x_filtered = torch.tensor(x_filtered, dtype=torch.double).unsqueeze(1)
 
         # 进行空间卷积
         x_filtered = x_filtered.permute(0, 4, 2, 3, 1)  # 调整维度顺序为 [batch, filterBands, channels, time, 1]

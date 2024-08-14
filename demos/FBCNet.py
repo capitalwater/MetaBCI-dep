@@ -19,6 +19,31 @@ paradigm = MotorImagery(
     srate=None
 )  # declare the paradigm, use recommended Options
 
+# add 6-30Hz bandpass filter in raw hook
+def raw_hook(raw, caches):
+    # do something with raw object
+    raw.filter(6, 30, l_trans_bandwidth=2,h_trans_bandwidth=5,
+        phase='zero-double')
+    caches['raw_stage'] = caches.get('raw_stage', -1) + 1
+    return raw, caches
+
+def epochs_hook(epochs, caches):
+    # do something with epochs object
+    print(epochs.event_id)
+    caches['epoch_stage'] = caches.get('epoch_stage', -1) + 1
+    return epochs, caches
+
+def data_hook(X, y, meta, caches):
+    # retrive caches from the last stage
+    print("Raw stage:{},Epochs stage:{}".format(caches['raw_stage'], caches['epoch_stage']))
+    # do something with X, y, and meta
+    caches['data_stage'] = caches.get('data_stage', -1) + 1
+    return X, y, meta, caches
+
+paradigm.register_raw_hook(raw_hook)
+paradigm.register_epochs_hook(epochs_hook)
+paradigm.register_data_hook(data_hook)
+
 # X,y are numpy array and meta is pandas dataFrame
 X, y, meta = paradigm.get_data(
     dataset,
@@ -34,58 +59,12 @@ indices = generate_kfold_indices(meta, kfold=kfold)
 # 创建FBCNet模型实例
 filter_band = 9
 estimator = FBCNet(15, 250, nBands=filter_band)
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(estimator.parameters(), lr=1e-5)
 
-
-def train_model(model, criterion, optimizer, train_loader, val_loader, num_epochs=25):
-    for epoch in range(num_epochs):
-        model.train()
-        running_loss = 0.0
-
-        for inputs, labels in train_loader:
-            optimizer.zero_grad()
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item() * inputs.size(0)
-
-        epoch_loss = running_loss / len(train_loader.dataset)
-        print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {epoch_loss:.4f}')
-
-
-def evaluate_model(model, test_loader):
-    model.eval()
-    corrects = 0
-
-    with torch.no_grad():
-        for inputs, labels in test_loader:
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)
-            corrects += torch.sum(preds == labels.data)
-
-    accuracy = corrects.double() / len(test_loader.dataset)
-    return accuracy.item()
-
-
-kf = KFold(n_splits=kfold)
 accs = []
-
-for train_index, test_index in kf.split(X):
-    train_data = torch.utils.data.TensorDataset(torch.Tensor(X[train_index]), torch.LongTensor(y[train_index]))
-    test_data = torch.utils.data.TensorDataset(torch.Tensor(X[test_index]), torch.LongTensor(y[test_index]))
-
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=32, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False)
-
-    estimator = FBCNet(15, 250, nBands=filter_band)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(estimator.parameters(), lr=1e-5)
-
-    train_model(estimator, criterion, optimizer, train_loader, test_loader, num_epochs=10)
-
-    accuracy = evaluate_model(estimator, test_loader)
-    accs.append(accuracy)
-
+for k in range(kfold):
+    train_ind, validate_ind, test_ind = match_kfold_indices(k, meta, indices)
+    # merge train and validate set
+    train_ind = np.concatenate((train_ind, validate_ind))
+    p_labels = estimator.fit(X[train_ind], y[train_ind]).predict(X[test_ind])
+    accs.append(np.mean(p_labels==y[test_ind]))
 print(np.mean(accs))

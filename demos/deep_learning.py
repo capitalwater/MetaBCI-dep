@@ -26,7 +26,7 @@ from metabci.brainda.datasets import Wang2016
 # )  # declare the paradigm, use recommended Options
 
 # dataset = Wang2016()
-dataset = BNCI2014001()
+dataset = AlexMI()
 paradigm = MotorImagery(
     channels=None,
     events=['right_hand', 'feet'],

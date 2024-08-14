@@ -16,19 +16,19 @@ wp=[(4,8),(8,12),(12,30)]
 ws=[(2,10),(6,14),(10,32)]
 filterbank = generate_filterbank(wp,ws,srate=128,order=4,rp=0.5)
 
-# dataset = AlexMI()
-dataset = Wang2016()
-# paradigm = MotorImagery(
-#     channels=None,
-#     events=['right_hand', 'feet'],
-#     intervals=[(0, 3)], # 3 seconds
-#     srate=128
-# )
-paradigm = SSVEP(
-    channels=['POZ', 'PZ', 'PO3', 'PO5', 'PO4', 'PO6', 'O1', 'OZ', 'O2'],
-    intervals=[(0.14, 0.64)],
-    srate=250
+dataset = AlexMI()
+# dataset = Wang2016()
+paradigm = MotorImagery(
+    channels=None,
+    events=['right_hand', 'feet'],
+    intervals=[(0, 3)], # 3 seconds
+    srate=128
 )
+# paradigm = SSVEP(
+#     channels=['POZ', 'PZ', 'PO3', 'PO5', 'PO4', 'PO6', 'O1', 'OZ', 'O2'],
+#     intervals=[(0.14, 0.64)],
+#     srate=250
+# )
 
 
 # add 6-30Hz bandpass filter in raw hook
